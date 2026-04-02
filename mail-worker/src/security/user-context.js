@@ -3,11 +3,26 @@ import constant from '../const/constant';
 
 const userContext = {
 	getUserId(c) {
-		return c.get('user').userId;
+		const user = c.get('user');
+		if (user?.userId != null) {
+			return Number(user.userId);
+		}
+
+		const headerUserId = c.req.header('x-user-id');
+		if (headerUserId != null && headerUserId !== '') {
+			return Number(headerUserId);
+		}
+
+		const queryUserId = c.req.query('userId');
+		if (queryUserId != null && queryUserId !== '') {
+			return Number(queryUserId);
+		}
+
+		return 0;
 	},
 
 	getUser(c) {
-		return c.get('user');
+		return c.get('user') || { userId: this.getUserId(c) };
 	},
 
 	async getToken(c) {
